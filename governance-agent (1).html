@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Governance Agent — Cloud Migration</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --navy-light: #1d3461;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --silver: #8892a4;
+    --white: #f0f4f8;
+    --red: #e05c5c;
+    --amber: #e0a83c;
+    --green: #4caf7d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(10,22,40,0.95);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: 0.3px;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(76,175,125,0.1);
+    border: 1px solid rgba(76,175,125,0.3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Main layout */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: calc(100vh - 73px);
+  }
+
+  /* Sidebar */
+  aside {
+    background: var(--navy-mid);
+    border-right: 1px solid rgba(201,168,76,0.15);
+    padding: 28px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .sidebar-section h3 {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .quick-query {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--silver);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Mono', monospace;
+    text-align: left;
+    width: 100%;
+    line-height: 1.5;
+  }
+
+  .quick-query:hover {
+    background: rgba(201,168,76,0.08);
+    border-color: rgba(201,168,76,0.3);
+    color: var(--white);
+  }
+
+  .quick-queries {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .risk-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--silver);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 12px;
+    color: var(--white);
+  }
+
+  /* Chat area */
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    background: var(--navy);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .welcome-card {
+    background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 12px;
+    padding: 28px 32px;
+    animation: fadeIn 0.6s ease;
+  }
+
+  .welcome-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+
+  .welcome-card p {
+    font-size: 12px;
+    color: var(--silver);
+    line-height: 1.7;
+    max-width: 560px;
+  }
+
+  .welcome-card .capabilities {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  .cap-tag {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message {
+    display: flex;
+    gap: 14px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .message.user {
+    flex-direction: row-reverse;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .avatar.agent {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+  }
+
+  .avatar.user {
+    background: var(--navy-light);
+    border: 1px solid rgba(201,168,76,0.3);
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .bubble {
+    max-width: 680px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    line-height: 1.75;
+  }
+
+  .bubble.agent {
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: var(--white);
+    border-top-left-radius: 2px;
+  }
+
+  .bubble.user {
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+    color: var(--white);
+    border-top-right-radius: 2px;
+  }
+
+  /* Risk badges in responses */
+  .bubble .risk-red { color: var(--red); font-weight: 500; }
+  .bubble .risk-amber { color: var(--amber); font-weight: 500; }
+  .bubble .risk-green { color: var(--green); font-weight: 500; }
+
+  .typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 16px 18px;
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    border-top-left-radius: 2px;
+    width: fit-content;
+  }
+
+  .typing-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 20px 40px 28px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(10,22,40,0.8);
+  }
+
+  .input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: border-color 0.2s;
+  }
+
+  .input-wrapper:focus-within {
+    border-color: rgba(201,168,76,0.5);
+  }
+
+  textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    resize: none;
+    line-height: 1.6;
+    max-height: 120px;
+    min-height: 24px;
+  }
+
+  textarea::placeholder {
+    color: var(--silver);
+    opacity: 0.6;
+  }
+
+  .send-btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s, transform 0.1s;
+    color: var(--navy);
+    font-size: 15px;
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .input-hint {
+    font-size: 10px;
+    color: var(--silver);
+    margin-top: 8px;
+    opacity: 0.5;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 2px; }
+
+  /* Formatted response content */
+  .bubble p { margin-bottom: 10px; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble strong { color: var(--gold-light); }
+  .bubble ul, .bubble ol { padding-left: 18px; margin: 8px 0; }
+  .bubble li { margin-bottom: 5px; }
+  .bubble hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 12px 0; }
+
+  /* API key setup */
+  .setup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,22,40,0.97);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    backdrop-filter: blur(8px);
+  }
+
+  .setup-card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 480px;
+    width: 90%;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .setup-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+
+  .setup-card p {
+    font-size: 12px;
+    color: var(--silver);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .setup-card input {
+    width: 100%;
+    background: var(--navy);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .setup-card input:focus {
+    border-color: rgba(201,168,76,0.5);
+  }
+
+  .setup-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    padding: 13px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: opacity 0.2s;
+  }
+
+  .setup-btn:hover { opacity: 0.85; }
+
+  .setup-note {
+    font-size: 10px;
+    color: var(--silver);
+    opacity: 0.6;
+    text-align: center;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- Setup Overlay -->
+<div class="setup-overlay" id="setupOverlay">
+  <div class="setup-card">
+    <h2>Governance Agent</h2>
+    <p>Enter your Azure OpenAI API key to activate the Project Governance Agent. Your key is stored only in your browser session and never shared.</p>
+    <input type="password" id="apiKeyInput" placeholder="Paste your Azure OpenAI API key here..." />
+    <button class="setup-btn" onclick="activateAgent()">ACTIVATE AGENT</button>
+    <p class="setup-note">Your key is from: AI Foundry → Models + endpoints → gpt-4o-mini → Key<br>Your key stays in your browser only — never stored or shared.</p>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">⚖️</div>
+    <div class="logo-text">
+      <h1>Project Governance Agent</h1>
+      <p>Cloud Migration Intelligence</p>
+    </div>
+  </div>
+  <div class="status-badge">
+    <div class="status-dot"></div>
+    AGENT ACTIVE
+  </div>
+</header>
+
+<!-- Main -->
+<main>
+  <!-- Sidebar -->
+  <aside>
+    <div class="sidebar-section">
+      <h3>Quick Queries</h3>
+      <div class="quick-queries">
+        <button class="quick-query" onclick="sendQuick('What are the top risks in this migration project with their RAG ratings?')">🔴 Show all risks with RAG status</button>
+        <button class="quick-query" onclick="sendQuick('Give me a 3-bullet executive summary for the steering committee.')">📋 Executive summary</button>
+        <button class="quick-query" onclick="sendQuick('Which workstreams are currently blocked or at risk?')">⚠️ Blocked workstreams</button>
+        <button class="quick-query" onclick="sendQuick('What are the key milestones and their current status?')">📅 Milestone status</button>
+        <button class="quick-query" onclick="sendQuick('Who are the risk owners and what actions are they responsible for?')">👤 Risk owners & actions</button>
+        <button class="quick-query" onclick="sendQuick('What budget risks or cost overruns have been identified?')">💰 Budget & cost risks</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>RAG Legend</h3>
+      <div class="risk-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Red — Immediate action required</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Amber — Monitor closely</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Green — On track</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Project Info</h3>
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Programme</span>
+          <span class="meta-value">Cloud Migration</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Platform</span>
+          <span class="meta-value">Azure AI Foundry</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Agent Type</span>
+          <span class="meta-value">Governance Intelligence</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Chat -->
+  <div class="chat-area">
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-card">
+        <h2>Good day. How can I assist?</h2>
+        <p>I am your Intelligent Project Governance Agent, trained on your Cloud Migration Programme documentation. Ask me about risks, milestones, workstream status, budget, owners, or request an executive briefing.</p>
+        <div class="capabilities">
+          <span class="cap-tag">Risk Analysis</span>
+          <span class="cap-tag">RAG Status</span>
+          <span class="cap-tag">Milestone Tracking</span>
+          <span class="cap-tag">Executive Summaries</span>
+          <span class="cap-tag">Owner Accountability</span>
+          <span class="cap-tag">Budget Intelligence</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea id="userInput" placeholder="Ask about risks, milestones, workstreams, budget..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+      <p class="input-hint">SHIFT + ENTER for new line · ENTER to send</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  let apiKey = '';
+  let conversationHistory = [];
+
+  const SYSTEM_PROMPT = `You are an Intelligent Project Governance Agent specialising in cloud migration programmes. You have deep expertise in infrastructure migration, risk management, RAG (Red/Amber/Green) status reporting, and programme governance.
+
+Your role is to:
+- Analyse and report on project risks with their Risk IDs, likelihood, impact, RAG ratings, mitigations, and owners
+- Provide executive-ready summaries suitable for steering committees
+- Track workstream status and identify blockers
+- Monitor milestones and flag delays
+- Identify budget risks and cost overruns
+- Hold owners accountable by tracking their assigned actions
+
+The project you govern is a Cloud Migration Programme moving Oracle on-premise systems to Azure. Key context from the project document includes:
+- Risk R001: Schema compatibility Oracle on-prem to Azure SQL — High likelihood, High impact, RED — Owner: Suresh Patel — Mitigation: Azure Database Migration Service POC underway
+- Risk R002: Network firewall approval slower than planned — High likelihood, Medium impact, AMBER — Owner: Priya Nair — Mitigation: Escalated to CISO, weekly sync established
+- Risk R003: Three legacy applications incompatible with lift-and-shift — Confirmed, High impact, AMBER — Owner: Meera Iyer — Mitigation: Re-architecture scoping in progress, additional $180K budget requested
+- Risk R004: Test environment dependency on WS3 completion — High likelihood, High impact, RED — Mitigation: Parallel track initiated, WS6 testing independent modules
+
+Always respond in a professional governance tone suitable for senior stakeholders. Use structured formatting with clear headings. Always reference Risk IDs when discussing risks. For RAG ratings, clearly label RED, AMBER, or GREEN. Be concise and action-oriented.`;
+
+  const AZURE_ENDPOINT = 'https://aksha-mlf7fwy0-eastus2.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2025-01-01-preview';
+
+  function activateAgent() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key || key.length < 10) {
+      alert('Please enter your Azure OpenAI API key.');
+      return;
+    }
+    apiKey = key;
+    document.getElementById('setupOverlay').style.display = 'none';
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function sendQuick(text) {
+    document.getElementById('userInput').value = text;
+    sendMessage();
+  }
+
+  function addMessage(role, content) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = `avatar ${role === 'assistant' ? 'agent' : 'user'}`;
+    avatar.textContent = role === 'assistant' ? '⚖️' : 'PM';
+
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${role === 'assistant' ? 'agent' : 'user'}`;
+    bubble.innerHTML = formatContent(content);
+
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return bubble;
+  }
+
+  function formatContent(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\bRED\b/g, '<span class="risk-red">🔴 RED</span>')
+      .replace(/\bAMBER\b/g, '<span class="risk-amber">🟡 AMBER</span>')
+      .replace(/\bGREEN\b/g, '<span class="risk-green">🟢 GREEN</span>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/^/, '<p>')
+      .replace(/$/, '</p>');
+  }
+
+  function showTyping() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'message assistant';
+    div.id = 'typingIndicator';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar agent';
+    avatar.textContent = '⚖️';
+
+    const indicator = document.createElement('div');
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+    div.appendChild(avatar);
+    div.appendChild(indicator);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text || !apiKey) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('sendBtn').disabled = true;
+
+    addMessage('user', text);
+    conversationHistory.push({ role: 'user', content: text });
+
+    showTyping();
+
+    try {
+      const response = await fetch(AZURE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': apiKey
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            ...conversationHistory
+          ],
+          max_tokens: 1000,
+          temperature: 0.7
+        })
+      });
+
+      const data = await response.json();
+      removeTyping();
+
+      if (data.choices && data.choices[0]) {
+        const reply = data.choices[0].message.content;
+        conversationHistory.push({ role: 'assistant', content: reply });
+        addMessage('assistant', reply);
+      } else if (data.error) {
+        addMessage('assistant', `⚠️ Azure API Error: ${data.error.code} — ${data.error.message}`);
+      } else {
+        addMessage('assistant', `⚠️ Unexpected response: ${JSON.stringify(data)}`);
+      }
+    } catch (err) {
+      removeTyping();
+      addMessage('assistant', `⚠️ Connection error: ${err.message}. Please verify your API key is valid and try again.`);
+    }
+
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('userInput').focus();
+  }
+</script>
+</body>
+</html>
