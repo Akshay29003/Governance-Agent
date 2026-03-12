@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'server.js'
-      - 'Dockerfile'
-      - 'package.json'
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
