@@ -6,9 +6,8 @@ import express from "express";
 import cors from "cors";
 // import {ClientSecretCredential} from "@azure/identity";
 import https from "https";
-const httpsAgent = new https.Agent({ rejectUnauthorized: false, keepAlive: true });
+const httpsAgent = new https.Agent({keepAlive: true});
 import axios from "axios";
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const app = express();
 //app.use(cors());
@@ -31,11 +30,6 @@ const TOKEN_SCOPE = "https://ai.azure.com/.default";
   //process.env.AZURE_CLIENT_ID,
   //process.env.AZURE_CLIENT_SECRET
 //);
-
-// TEMP DEBUG — remove after fix
-console.log("TENANT:", process.env.AZURE_TENANT_ID ? "SET" : "MISSING");
-console.log("CLIENT:", process.env.AZURE_CLIENT_ID ? "SET" : "MISSING");
-console.log("SECRET:", process.env.AZURE_CLIENT_SECRET ? "SET" : "MISSING");
 
 // ─── AUTH HELPER ─────────────────────────────────────────────────────────────
 
@@ -223,7 +217,7 @@ function makeGovernanceRoute(promptKey) {
       res.json({ success: true, data: parsed, timestamp: new Date().toISOString() });
     } catch (err) {
       console.error(`[${promptKey.toUpperCase()}] error:`, err.message);
-      res.status(500).json({ success: false, error: err.message });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   };
 }
@@ -248,7 +242,7 @@ app.post("/api/chat", async (req, res) => {
     res.json({ success: true, reply, timestamp: new Date().toISOString() });
   } catch (err) {
     console.error("[CHAT] error:", err.message);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 
@@ -259,7 +253,7 @@ app.get("/api/health", async (_req, res) => {
     await getBearerToken(); // Confirms credential chain is working
     res.json({ status: "ok", agent: AGENT_ID, timestamp: new Date().toISOString() });
   } catch (err) {
-    res.status(503).json({ status: "error", error: err.message });
+    res.status(503).json({ status: "error", error: "Service Unavailable" });
   }
 });
 
