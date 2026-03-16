@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# Intelligent Project Governance Agent
+### AI-Powered Full-Stack Portfolio Project — Stage 1 Complete
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A production-deployed AI application on Microsoft Azure that acts as a **virtual PMO analyst** — reading an unstructured project knowledge base and generating live governance outputs on demand.
 
-## Available Scripts
+🔗 **Live Dashboard:** https://salmon-field-04d6f670f.4.azurestaticapps.net
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## What It Does
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+No hardcoded data. No static dashboards. The system ingests a project knowledge base document and surfaces:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Risk Register** — live risk identification with severity, probability, owner, and mitigation
+- **Workstream Status** — RAG status and progress for all active workstreams
+- **Milestone Tracker** — upcoming, in-progress, and completed milestones
+- **Executive Summary** — overall project health, key achievements, and next steps
 
-### `npm test`
+All outputs are generated in real time by an Azure AI Foundry Agent.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Architecture
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React.js → Azure Static Web Apps |
+| Middleware | Node.js + Express → Azure Container Apps |
+| AI Agent | Azure AI Foundry (Agent + Knowledge Base) |
+| Auth | Microsoft Entra ID — direct OAuth2 token flow |
+| CI/CD | GitHub Actions → Docker → GHCR |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Key Technical Decisions
 
-### `npm run eject`
+**Direct OAuth2 over Azure SDK** — Replaced `ClientSecretCredential` SDK with a direct `axios` POST to Microsoft's token endpoint after diagnosing network egress restrictions inside Container Apps.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**GHCR over ACR** — Used GitHub Container Registry to stay within free-tier budget while maintaining full CI/CD capability.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**Container Apps over Azure Functions** — Selected for persistent middleware after Azure Functions quota failures, enabling reliable 3-minute AI agent polling cycles.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+**Sequential API Loading** — Resolved concurrent timeout failures by loading all four governance endpoints sequentially, preventing agent thread collisions on the Foundry backend.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## Delivery Challenges Resolved
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+| Challenge | Resolution |
+|-----------|-----------|
+| TLS Handshake Failures | Diagnosed SSL errors calling Azure AI Foundry from containerised middleware |
+| ESM/CommonJS Conflict | Fixed mixed module syntax causing silent runtime failures |
+| Azure SDK Network Block | Replaced SDK auth with direct axios OAuth2 call |
+| API Key Exposure | Detected accidental commit, rotated all affected credentials |
+| Container Auth Failure | Resolved IMDS unreachability by switching to service principal |
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## PM Contribution
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Built as a portfolio project to demonstrate AI Delivery capability at a technical level. All architectural decisions, trade-off calls, and delivery ownership by **Akshay Kaul** (Senior IT Project Manager, 15 years experience). AI assistance used for code generation.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Stage 2 Roadmap
 
-### Making a Progressive Web App
+- Dynamic document ingestion — upload any project document, dashboard auto-adapts
+- Multi-project support
+- Gantt-style milestone timeline
+- One-click steering committee report export (PDF)
+- Role-based access control
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+*Built by Akshay Kaul — Greater Noida | Targeting: Digital Transformation PM · AI Delivery Manager · Technology Consulting Manager*
