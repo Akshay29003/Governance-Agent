@@ -169,11 +169,17 @@ Each workstream object must have exactly these fields:
 Respond ONLY with the raw JSON array — no markdown, no explanation.`,
 
   milestones: `You are a project governance assistant.
-Analyse the project knowledge base and return all project milestones as a JSON array.
+Analyse the project knowledge base and locate Section 5 "Key Milestones".
+Return all milestones as a JSON array.
 Each milestone object must have exactly these fields:
-  id (string), title (string), description (string), dueDate (ISO date string),
-  status ("Upcoming"|"In Progress"|"Complete"|"Overdue"),
-  workstream (string), owner (string).
+  id (string, e.g. "M001", "M002" etc — generate sequentially),
+  title (string — the milestone name),
+  description (string — comments or context),
+  dueDate (ISO date string — use Planned Date),
+  forecastDate (ISO date string — use Forecast Date),
+  status ("Complete"|"In Progress"|"Upcoming"|"Overdue"|"At Risk" — map from the Status column),
+  workstream (string — infer from context),
+  owner (string — infer from workstream owner).
 Respond ONLY with the raw JSON array — no markdown, no explanation.`,
 
   summary: `You are a project governance assistant.
